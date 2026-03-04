@@ -1,12 +1,40 @@
+import { useState, useEffect } from 'react';
 import NavBar from '../components/NavBar';
 import ShopHeader from '../components/ShopHeader';
 import ProductCard from '../components/ProductCard';
 import CurvedLoop from '../components/Loop';
-import { products } from '../data/products';
 import FooterSlider from '../components/FooterSlider';
 import Footer from '../components/Footer';
+import { productService } from '../services/productService';
+import type { Product } from '../types/database.types';
 
 const ShopPage = () => {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const data = await productService.getAllProducts();
+        setProducts(data);
+        setError(null);
+      } catch (err) {
+        console.error('Failed to fetch products:', err);
+        setError('Failed to load products. Please try again later.');
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
+  if (error) {
+    return (
+      <div className="bg-black min-h-screen flex items-center justify-center">
+        <div className="text-red-500 text-2xl">{error}</div>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-black min-h-screen no-scrollbar overflow-x-hidden">
       <NavBar />
@@ -22,12 +50,10 @@ const ShopPage = () => {
       </div>
 
       <main className="max-w-[1800px] mx-auto px-6 md:px-20 py-24">
-        {/* CHANGED: Changed items-end to items-baseline for better alignment with text */}
         <div className="flex flex-col md:flex-row md:items-baseline justify-between mb-20 gap-4">
           <h2 className="text-white text-6xl md:text-8xl font-black italic tracking-tighter uppercase leading-[0.9]">
             New <br/> Arrivals
           </h2>
-          {/* CHANGED: Added md:pb-2 to give the count some breathing room from the baseline */}
           <span className="text-zinc-500 text-sm font-bold uppercase tracking-[0.2em] md:pb-2">
             {products.length} Items Total
           </span>
@@ -57,9 +83,9 @@ const ShopPage = () => {
           </div>
 
           {/* PRODUCT CARDS LOOP */}
-          {products.map((item: any, index: number) => (
-            <div key={index} className="md:col-span-1 md:row-span-1">
-              <ProductCard name={item.name} price={item.price} image={item.image} />
+          {products.map((product) => (
+            <div key={product.id} className="md:col-span-1 md:row-span-1">
+              <ProductCard product={product} />
             </div>
           ))}
         </div>

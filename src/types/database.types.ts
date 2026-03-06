@@ -15,3 +15,22 @@ export type Category = {
   name: string;
   // add other category fields as needed
 }
+
+// Lookbook
+export type LookbookVolume = {
+  id: string;
+  title: string;
+  vol: string;
+  cover_image_path: string;
+  description: string | null;
+  display_order: number;
+  created_at: string | null;
+}
+
+export type LookbookImage = {
+  id: string;
+  volume_id: string;
+  image_path: string;
+  display_order: number;
+  created_at: string | null;
+}

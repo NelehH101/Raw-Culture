@@ -1,16 +1,21 @@
 import { useState, useEffect } from 'react';
 import { X, Plus, Minus } from 'lucide-react';
+import { useCart } from '../context/CartContext'; // 1. Import the hook
 
 interface ProductProps {
+  id: number;     // 2. Added ID to props
   name: string;
   price: string;
   image: string;
 }
 
-const ProductCard = ({ name, price, image }: ProductProps) => {
+const ProductCard = ({ id, name, price, image }: ProductProps) => {
+  const { addToCart } = useCart(); // 3. Access the global add function
+  const cleanPrice = price.replace(/[$]/g, '').trim();
   const [isOpen, setIsOpen] = useState(false);
   const [selectedSize, setSelectedSize] = useState('M');
   const [quantity, setQuantity] = useState(1);
+  const [isAdded, setIsAdded] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -21,11 +26,13 @@ const ProductCard = ({ name, price, image }: ProductProps) => {
     return () => document.body.classList.remove('overflow-hidden');
   }, [isOpen]);
 
-  const [isAdded, setIsAdded] = useState(false);
-
   const handleAddToCart = () => {
     setIsAdded(true);
-    // Add your logic to update a global cart state here
+    
+    // 4. Update Global Cart State
+    // We pass the product object and the local quantity state
+    addToCart({ id, name, price, image }, quantity);
+
     setTimeout(() => setIsAdded(false), 2000);
   };
 
@@ -37,11 +44,11 @@ const ProductCard = ({ name, price, image }: ProductProps) => {
         onClick={() => setIsOpen(true)}
       >
         <img src={image} alt={name} className="w-full h-full object-cover transition-transform duration-[1.5s] ease-out group-hover:scale-110 opacity-80 group-hover:opacity-100" />
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/20 group-hover:bg-black/40 transition-colors duration-500 p-6 text-center">
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 group-hover:bg-black/70 transition-colors duration-500 p-6 text-center">
           <span className="text-white/70 text-[10px] font-bold uppercase tracking-[0.3em] mb-2 transform transition-transform duration-500 group-hover:-translate-y-1">Latest</span>
           <h3 className="text-white text-3xl md:text-4xl font-black italic tracking-tighter uppercase leading-tight mb-4">{name}</h3>
           <div className="opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500">
-            <span className="text-orange-500 text-xs font-black tracking-widest uppercase">{price}</span>
+            <span className="text-orange-500 text-lg font-black tracking-widest uppercase">{cleanPrice}</span>
           </div>
         </div>
       </div>
@@ -49,18 +56,15 @@ const ProductCard = ({ name, price, image }: ProductProps) => {
       {/* Modern Side-Info Modal */}
       {isOpen && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center overflow-hidden">
-          {/* Backdrop - Deeper blur for focus */}
           <div className="absolute inset-0 bg-black/95 backdrop-blur-3xl animate-in fade-in duration-700" onClick={() => setIsOpen(false)} />
 
-          {/* Container: Increased max-width to allow the image to grow bigger */}
           <div className="relative z-[205] w-full max-w-[1600px] h-full flex flex-col md:flex-row items-center justify-between p-6 md:px-12 lg:px-20">
 
-            {/* Close Button */}
             <button className="absolute top-10 right-10 text-white/30 hover:text-orange-500 transition-colors z-[210] p-2" onClick={() => setIsOpen(false)}>
               <X size={32} strokeWidth={1} />
             </button>
 
-            {/* LEFT: Product Image - Increased height to 90vh */}
+            {/* LEFT: Product Image */}
             <div className="flex-[1.5] flex items-center justify-center h-full pointer-events-none p-4">
               <img
                 src={image}
@@ -69,7 +73,7 @@ const ProductCard = ({ name, price, image }: ProductProps) => {
               />
             </div>
 
-            {/* RIGHT: Floating Side Panel - Compact width keeps it clean */}
+            {/* RIGHT: Floating Side Panel */}
             <div className="w-full md:w-[340px] bg-[#0a0a0a]/90 backdrop-blur-md p-10 rounded-[40px] border border-white/5 text-white animate-in slide-in-from-right-12 duration-700 md:ml-6 lg:ml-10">
               <div className="mb-10">
                 <div className="flex items-center gap-2 mb-4">
@@ -77,7 +81,7 @@ const ProductCard = ({ name, price, image }: ProductProps) => {
                   <span className="text-orange-500 text-[9px] font-black uppercase tracking-[0.4em]">In Stock</span>
                 </div>
                 <h2 className="text-2xl font-black italic tracking-tighter uppercase leading-none mb-2">{name}</h2>
-                <p className="text-xl italic font-bold text-orange-500">{price}</p>
+                <p className="text-xl italic font-bold text-orange-500">{cleanPrice}</p>
               </div>
 
               {/* Size Selection */}

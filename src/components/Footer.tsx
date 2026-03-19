@@ -15,9 +15,9 @@ const Footer = () => {
 
         {/* Links Group */}
         <div className="flex flex-wrap gap-x-6 gap-y-3 text-zinc-500">
-          <a href="#" className="hover:text-orange-500 transition-all duration-300">Terms</a>
-          <a href="#" className="hover:text-orange-500 transition-all duration-300">Privacy</a>
-          <a href="#" className="hover:text-orange-500 transition-all duration-300">Cookies</a>
+          <a href="/terms" className="hover:text-orange-500 transition-all duration-300">Terms</a>
+          <a href="/privacy" className="hover:text-orange-500 transition-all duration-300">Privacy</a>
+          <a href="/cookies" className="hover:text-orange-500 transition-all duration-300">Cookies</a>
         </div>
 
         {/* Copyright and Button */}

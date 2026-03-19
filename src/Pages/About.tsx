@@ -16,7 +16,7 @@ const AboutPage = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="text-7xl md:text-[12rem] font-black italic uppercase tracking-tighter leading-[0.85] mb-16"
+          className="text-7xl md:text-[10.5rem] font-black italic uppercase tracking-tighter leading-[0.85] mb-16"
         >
           Raw <br/> <span className="text-orange-500">Culture.</span>
         </motion.h1>

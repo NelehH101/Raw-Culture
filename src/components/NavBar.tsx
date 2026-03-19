@@ -61,22 +61,22 @@ const NavBar = () => {
                         />
                     </Link>
 
-                    {/* Desktop Links (No highlight here, as per your request) */}
+                    {/* Desktop Links */}
                     <div className={`
                         hidden md:flex items-center gap-6 text-[18px] font-regular transition-all duration-300
                         ${isShrunk ? 'opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto' : 'opacity-100'}
                     `}>
-                        <Link to="/shop" className="hover:opacity-60">Products</Link>
-                        <Link to="/lookbook" className="hover:opacity-60">LookBook</Link>
-                        <Link to="/about" className="hover:opacity-60">About</Link>
-                        <Link to="/trackorders" className="hover:opacity-60">Track Orders</Link>
+                        <Link to="/shop" className="relative hover:opacity-60 before:absolute before:bottom-0 before:left-0 before:h-[2px] before:w-0 before:bg-gradient-to-r before:from-pink-500 before:via-purple-500 before:to-blue-500 before:transition-[width] before:duration-300 hover:before:w-full">Products</Link>
+                        <Link to="/lookbook" className="relative hover:opacity-60 before:absolute before:bottom-0 before:left-0 before:h-[2px] before:w-0 before:bg-gradient-to-r before:from-pink-500 before:via-purple-500 before:to-blue-500 before:transition-[width] before:duration-300 hover:before:w-full">LookBook</Link>
+                        <Link to="/about" className="relative hover:opacity-60 before:absolute before:bottom-0 before:left-0 before:h-[2px] before:w-0 before:bg-gradient-to-r before:from-pink-500 before:via-purple-500 before:to-blue-500 before:transition-[width] before:duration-300 hover:before:w-full">About</Link>
+                        <Link to="/trackorders" className="relative hover:opacity-60 before:absolute before:bottom-0 before:left-0 before:h-[2px] before:w-0 before:bg-gradient-to-r before:from-pink-500 before:via-purple-500 before:to-blue-500 before:transition-[width] before:duration-300 hover:before:w-full">Track Orders</Link>
                     </div>
 
                     {/* Right Side Actions */}
                     <div className="flex items-center gap-3 z-10">
-                        <button className="bg-orange-500 hover:bg-[#e64500] text-white text-[11px] font-semibold uppercase px-5 md:px-7 py-2 rounded-full flex-shrink-0 transition-transform active:scale-95">
+                        <Link to="/contact" className="bg-orange-500 hover:bg-[#e64500] text-white text-[11px] font-semibold uppercase px-5 md:px-7 py-2 rounded-full flex-shrink-0 transition-transform active:scale-95">
                             Contact
-                        </button>
+                        </Link>
 
                         <button 
                             onClick={(e) => {
@@ -103,7 +103,6 @@ const NavBar = () => {
                     { name: 'About', path: '/about' },
                     { name: 'Track Orders', path: '/trackorders' },
                 ].map((item) => {
-                    // Check if current route matches this link
                     const isActive = location.pathname === item.path;
 
                     return (

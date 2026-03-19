@@ -18,11 +18,16 @@ import GlobalPlayer from "./components/GlobalPlayer";
 import CustomCursor from "./components/CustomCursor";
 import CartDrawer from "./components/CartDrawer";
 import FloatingCart from "./components/FloatingCart";
+import AllProducts from "./Pages/AllProducts";
+import AccessoriesPage from "./Pages/AccessoriesPage";
+import DecksPage from "./Pages/DecksPage";
+import OuterwearPage from "./Pages/OuterwearPage";
+import VisualsPage from "./Pages/VisualsPage";
 
 // 1. Create a sub-component to handle location-based rendering
 const LayoutManager = () => {
   const location = useLocation();
-  
+
   // Hide cart on Home ('/'), Checkout, and Success pages for a cleaner look
   const hideCartOn = ["/", "/checkout", "/success"];
   const shouldShowCart = !hideCartOn.includes(location.pathname);
@@ -38,6 +43,11 @@ const LayoutManager = () => {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/shop" element={<Shop />} />
+        <Route path="/shop/:category" element={<AllProducts />} />
+        <Route path="/shop/decks" element={<DecksPage />} />
+        <Route path="/shop/outerwear" element={<OuterwearPage />} />
+        <Route path="/shop/accessories" element={<AccessoriesPage />} />
+        <Route path="/shop/visuals" element={<VisualsPage />} />
         <Route path="/lookbook" element={<Lookbook />} />
         <Route path="/trackorders" element={<TrackOrders />} />
         <Route path="/contact" element={<Contact />} />

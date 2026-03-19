@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { X, ArrowUpRight, ChevronRight } from 'lucide-react';
 import NavBar from '../components/NavBar';
 import ShopHeader from '../components/ShopHeader';
@@ -29,15 +30,15 @@ const ShopPage = () => {
   return (
     <div className="bg-black min-h-screen no-scrollbar overflow-x-hidden">
       <NavBar />
-      
+
       {/* --- CATEGORY SIDEBAR OVERLAY --- */}
       <div className={`fixed inset-0 z-[500] transition-all duration-700 ${isCategoryOpen ? 'visible' : 'invisible pointer-events-none'}`}>
         {/* Dark Blur Backdrop */}
-        <div 
-          className={`absolute inset-0 bg-black/90 backdrop-blur-2xl transition-opacity duration-700 ${isCategoryOpen ? 'opacity-100' : 'opacity-0'}`} 
+        <div
+          className={`absolute inset-0 bg-black/90 backdrop-blur-2xl transition-opacity duration-700 ${isCategoryOpen ? 'opacity-100' : 'opacity-0'}`}
           onClick={() => setIsCategoryOpen(false)}
         />
-        
+
         {/* Sliding Panel */}
         <div className={`absolute right-0 top-0 h-full w-full md:w-[550px] bg-zinc-950 border-l border-white/5 p-12 shadow-2xl transform transition-transform duration-700 ease-out ${isCategoryOpen ? 'translate-x-0' : 'translate-x-full'}`}>
           <div className="flex justify-between items-center mb-20">
@@ -48,22 +49,34 @@ const ShopPage = () => {
           </div>
 
           <h2 className="text-white text-6xl font-black italic uppercase tracking-tighter mb-12 leading-none">
-            Browse <br/> <span className="text-zinc-800">Archive</span>
+            Browse <br /> <span className="text-orange-500">Archive</span>
           </h2>
-          
-          <nav className="flex flex-col gap-4">
-            {['All Products', 'New Arrivals', 'Outerwear', 'Decks', 'Accessories', 'Visuals'].map((cat) => (
-              <button 
-                key={cat} 
-                className="group flex items-center justify-between w-full py-6 border-b border-white/5 text-left"
-              >
-                <span className="text-2xl font-bold uppercase tracking-[0.2em] text-zinc-600 group-hover:text-white group-hover:italic transition-all duration-300">
-                  {cat}
-                </span>
-                <ChevronRight className="text-zinc-800 group-hover:text-orange-500 transition-all transform group-hover:translate-x-2" />
-              </button>
-            ))}
-          </nav>
+
+          {/* 1. Add overflow-y-auto and flex-1 to make this area fill space and scroll */}
+          <div className="flex-1 overflow-y-auto no-scrollbar pr-4 -mr-4">
+            <nav className="flex flex-col gap-0 pb-20">
+              {['All Products', 'New Arrivals', 'Outerwear', 'Decks', 'Accessories', 'Visuals'].map((cat) => (
+                <Link
+                  key={cat}
+
+                  to={`/shop/${cat.toLowerCase().replace(/\s+/g, '-')}`}
+
+                  onClick={() => setIsCategoryOpen(false)}
+                  className="group flex items-center justify-between w-full py-6 border-b border-white/5 text-left transition-all"
+                >
+                  <span className="text-2xl font-bold uppercase tracking-[0.2em] text-zinc-600 group-hover:text-white group-hover:italic transition-all duration-300">
+                    {cat}
+                  </span>
+
+                  {/* 2. Arrow icon moves slightly on hover */}
+                  <ChevronRight
+                    className="text-zinc-800 group-hover:text-orange-500 transition-all transform group-hover:translate-x-2"
+                    size={20}
+                  />
+                </Link>
+              ))}
+            </nav>
+          </div>
 
           <div className="absolute bottom-12 left-12">
             <p className="text-[9px] text-zinc-800 font-black uppercase tracking-[0.5em]">RAW_CULTURE // PROTOCOL_2026</p>
@@ -71,7 +84,9 @@ const ShopPage = () => {
         </div>
       </div>
 
-      <ShopHeader />
+      <div className="pt-24">
+        <ShopHeader />
+      </div>
 
       {/* Marquee Section */}
       <div className="relative z-10 bg-black py-6">
@@ -118,28 +133,26 @@ const ShopPage = () => {
           ))}
 
           {/* --- THE CLICKABLE ORANGE BLOCK --- */}
-          <div 
+          <div
             className="col-span-1 md:col-span-2 relative bg-orange-500 rounded-[40px] p-10 cursor-pointer overflow-hidden transition-all duration-500 hover:bg-orange-600 active:scale-[0.98] flex flex-col justify-between group shadow-[0_20px_50px_rgba(249,115,22,0.2)]"
             onClick={() => setIsCategoryOpen(true)}
           >
-            {/* White Technical Border from Wireframe */}
-            <div className="absolute inset-6 border border-white/20 rounded-[30px] pointer-events-none" />
-            
+
             <div className="relative flex justify-end z-10">
               <div className="p-4 bg-white/10 rounded-full backdrop-blur-md border border-white/10 group-hover:rotate-45 transition-transform duration-700">
                 <ArrowUpRight className="text-white" size={32} strokeWidth={3} />
               </div>
             </div>
-            
+
             <div className="relative z-10">
               <span className="text-white/40 text-[10px] font-black uppercase tracking-[0.5em] mb-3 block italic">
                 Access_Catalog // Ver. 2.0
               </span>
               <h2 className="text-white text-5xl md:text-7xl font-black italic tracking-tighter uppercase leading-[0.75]">
-                All <br/> Products
+                All <br /> Products
               </h2>
             </div>
-            
+
             <div className="absolute -bottom-20 -right-20 w-80 h-80 bg-white/10 blur-[100px] rounded-full group-hover:scale-125 transition-transform duration-1000" />
           </div>
 
@@ -149,7 +162,7 @@ const ShopPage = () => {
               <ProductCard {...item} />
             </div>
           ))}
-          
+
         </div>
       </main>
 

@@ -1,22 +1,17 @@
 import { useState, useEffect } from 'react';
 import { X, Plus, Minus } from 'lucide-react';
-import type { Product } from '../types/database.types';
 
-interface ProductCardProps {
-  product: Product;
+interface ProductProps {
+  name: string;
+  price: string;
+  image: string;
 }
 
-// interface ProductProps {
-//   name: string;
-//   price: string;
-//   image: string;
-// }
-
-const ProductCard = ({ product }: ProductCardProps) => {
+const ProductCard = ({ name, price, image }: ProductProps) => {
+  const cleanPrice = price.replace(/[$]/g, '').trim();
   const [isOpen, setIsOpen] = useState(false);
   const [selectedSize, setSelectedSize] = useState('M');
   const [quantity, setQuantity] = useState(1);
-  const [imageError, setImageError] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -42,26 +37,12 @@ const ProductCard = ({ product }: ProductCardProps) => {
         className="group relative h-full w-full bg-white/5 rounded-[40px] overflow-hidden cursor-pointer transition-all duration-700"
         onClick={() => setIsOpen(true)}
       >
-       {product.image_url && !imageError ? (
-          <img 
-            src={product.image_url} 
-            alt={product.name} 
-            className="w-full h-full object-cover transition-transform duration-[1.5s] ease-out group-hover:scale-110 opacity-80 group-hover:opacity-100"
-            onError={() => setImageError(true)}
-          />
-        ) : (
-          <div className="w-full h-full bg-gradient-to-br from-zinc-800 to-zinc-900 flex items-center justify-center">
-            <div className="text-center">
-              <span className="text-zinc-600 text-sm block mb-2">🖼️</span>
-              <span className="text-zinc-700 text-xs uppercase tracking-wider">No image</span>
-            </div>
-          </div>
-        )}
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/20 group-hover:bg-black/40 transition-colors duration-500 p-6 text-center">
+        <img src={image} alt={name} className="w-full h-full object-cover transition-transform duration-[1.5s] ease-out group-hover:scale-110 opacity-80 group-hover:opacity-100" />
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 group-hover:bg-black/70 transition-colors duration-500 p-6 text-center">
           <span className="text-white/70 text-[10px] font-bold uppercase tracking-[0.3em] mb-2 transform transition-transform duration-500 group-hover:-translate-y-1">Latest</span>
-          <h3 className="text-white text-3xl md:text-4xl font-black italic tracking-tighter uppercase leading-tight mb-4">{product.name}</h3>
+          <h3 className="text-white text-3xl md:text-4xl font-black italic tracking-tighter uppercase leading-tight mb-4">{name}</h3>
           <div className="opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500">
-            <span className="text-orange-500 text-xs font-black tracking-widest uppercase">{product.price}</span>
+            <span className="text-orange-500 text-xs font-black tracking-widest uppercase">R {cleanPrice}</span>
           </div>
         </div>
       </div>
@@ -82,21 +63,11 @@ const ProductCard = ({ product }: ProductCardProps) => {
 
             {/* LEFT: Product Image - Increased height to 90vh */}
             <div className="flex-[1.5] flex items-center justify-center h-full pointer-events-none p-4">
-              {product.image_url && !imageError ? (
-                <img
-                  src={product.image_url}
-                  alt={product.name}
-                  className="w-full h-full max-h-[75vh] object-contain drop-shadow-[0_0_120px_rgba(255,255,255,0.08)] animate-in zoom-in-95 duration-1000 ease-out"
-                  onError={() => setImageError(true)}
-                />
-              ) : (
-                <div className="w-full h-full max-h-[75vh] bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-[40px] flex items-center justify-center">
-                  <div className="text-center">
-                    <span className="text-6xl block mb-4 opacity-20">🖼️</span>
-                    <span className="text-zinc-700 text-sm uppercase tracking-wider">Image not available</span>
-                  </div>
-                </div>
-              )}
+              <img
+                src={image}
+                alt={name}
+                className="w-full h-full max-h-[75vh] object-contain drop-shadow-[0_0_120px_rgba(255,255,255,0.08)] animate-in zoom-in-95 duration-1000 ease-out"
+              />
             </div>
 
             {/* RIGHT: Floating Side Panel - Compact width keeps it clean */}
@@ -106,8 +77,8 @@ const ProductCard = ({ product }: ProductCardProps) => {
                   <div className="w-1.5 h-1.5 bg-orange-500 rounded-full shadow-[0_0_8px_rgba(249,115,22,0.6)]" />
                   <span className="text-orange-500 text-[9px] font-black uppercase tracking-[0.4em]">In Stock</span>
                 </div>
-                <h2 className="text-2xl font-black italic tracking-tighter uppercase leading-none mb-2">{product.name}</h2>
-                <p className="text-xl italic font-bold text-orange-500">{product.price}</p>
+                <h2 className="text-2xl font-black italic tracking-tighter uppercase leading-none mb-2">{name}</h2>
+                <p className="text-xl italic font-bold text-orange-500">R {cleanPrice}</p>
               </div>
 
               {/* Size Selection */}

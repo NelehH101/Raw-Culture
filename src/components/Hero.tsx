@@ -59,7 +59,7 @@ const Hero: React.FC = () => {
       <div className="absolute inset-0 flex flex-col items-center justify-center z-20 pointer-events-none">
         <img
           src={currentLogo}
-          className="w-24 md:w-32 mb-4 transition-all duration-300 cursor-pointer pointer-events-auto"
+          className="w-24 md:w-32 mb-4 transition-all duration-300 pointer-events-auto"
           onMouseEnter={handleLogoHover}
           onMouseLeave={() => setCurrentLogo(logoImages[0])}
           alt="Logo"

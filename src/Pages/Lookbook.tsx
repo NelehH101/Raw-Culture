@@ -3,50 +3,72 @@ import { motion, AnimatePresence } from 'framer-motion';
 import NavBar from '../components/NavBar';
 import CurvedLoop from '../components/Loop';
 import Footer from '../components/Footer';
+import { fetchImagesByVolume, fetchVolumes, type LookbookImageWithUrl, type LookbookVolumeWithUrl } from '../services/lookbookService';
 
 // Define the magazine data structure
-const VOLUMES = [
-  {
-    id: 1,
-    title: "YOUNG STAGE",
-    vol: "01",
-    cover: "/lookbook/LB (12).jpg",
-    description: "A digital tactile archive exploring urban landscape and community grit.",
-    images: Array.from({ length: 15 }, (_, i) => i + 1) // Images 1-15
-  },
-  {
-    id: 2,
-    title: "URBAN GRIT",
-    vol: "02",
-    cover: "/lookbook/LB (20).jpg",
-    description: "Raw textures and industrial silhouettes of the inner city.",
-    images: Array.from({ length: 15 }, (_, i) => i + 16) // Images 16-30
-  }
-];
+// const VOLUMES = [
+//   {
+//     id: 1,
+//     title: "YOUNG STAGE",
+//     vol: "01",
+//     cover: "/lookbook/LB (12).jpg",
+//     description: "A digital tactile archive exploring urban landscape and community grit.",
+//     images: Array.from({ length: 15 }, (_, i) => i + 1) // Images 1-15
+//   },
+//   {
+//     id: 2,
+//     title: "URBAN GRIT",
+//     vol: "02",
+//     cover: "/lookbook/LB (20).jpg",
+//     description: "Raw textures and industrial silhouettes of the inner city.",
+//     images: Array.from({ length: 15 }, (_, i) => i + 16) // Images 16-30
+//   }
+// ];
 
 const Lookbook = () => {
-  const [activeVolume, setActiveVolume] = useState<typeof VOLUMES[0] | null>(null);
-  const [likedImages, setLikedImages] = useState<number[]>([]);
+  const [volumes, setVolumes] = useState<LookbookVolumeWithUrl[]>([]);
+  const [activeVolume, setActiveVolume] = useState<LookbookVolumeWithUrl | null>(null);
+  const [images, setImages] = useState<LookbookImageWithUrl[]>([]);
+  const [likedIds, setLikedIds] = useState<string[]>([]);
   const [showArchiveOnly, setShowArchiveOnly] = useState(false);
+  const [loadingVolumes, setLoadingVolumes] = useState(true);
+  const [loadingImages, setLoadingImages] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Load volumes on mount
+  useEffect(() => {
+    fetchVolumes()
+      .then(setVolumes)
+      .catch(() => setError('Failed to load volumes.'))
+      .finally(() => setLoadingVolumes(false));
+  }, []);
 
   useEffect(() => {
     const savedLikes = localStorage.getItem('raw_lookbook_likes');
-    if (savedLikes) setLikedImages(JSON.parse(savedLikes));
+    if (savedLikes) setLikedIds(JSON.parse(savedLikes));
   }, []);
 
-  const toggleLike = (num: number) => {
-    const updatedLikes = likedImages.includes(num)
-      ? likedImages.filter((id) => id !== num)
-      : [...likedImages, num];
-    setLikedImages(updatedLikes);
+  // Load images when a volume is selected
+  useEffect(() => {
+    if (!activeVolume) return;
+    setLoadingImages(true);
+    fetchImagesByVolume(activeVolume.id)
+      .then(setImages)
+      .catch(() => setError('Failed to load images.'))
+      .finally(() => setLoadingImages(false));
+  }, [activeVolume]);
+
+  const toggleLike = (id: string) => {
+    const updatedLikes = likedIds.includes(id)
+      ? likedIds.filter((id) => id !== id)
+      : [...likedIds, id];
+    setLikedIds(updatedLikes);
     localStorage.setItem('raw_lookbook_likes', JSON.stringify(updatedLikes));
   };
 
-  const displayedImages = activeVolume 
-    ? (showArchiveOnly 
-        ? activeVolume.images.filter(num => likedImages.includes(num))
-        : activeVolume.images)
-    : [];
+  const displayedImages = showArchiveOnly && activeVolume 
+    ? images.filter((img) => likedIds.includes(img.id))
+    : images;
 
   return (
     <div className="bg-black min-h-screen no-scrollbar overflow-x-hidden relative flex flex-col">
@@ -107,7 +129,7 @@ const Lookbook = () => {
                 exit={{ opacity: 0, y: -20 }}
                 className="flex flex-col md:flex-row gap-8 pb-20"
               >
-                {VOLUMES.map((vol) => (
+                {volumes.map((vol) => (
                   <motion.div 
                     key={vol.id}
                     whileHover={{ y: -10 }}
@@ -115,7 +137,7 @@ const Lookbook = () => {
                     onClick={() => setActiveVolume(vol)}
                   >
                     <div className="relative aspect-[3/4] bg-zinc-900 rounded-xl overflow-hidden border border-white/5 shadow-2xl transition-all duration-500 group-hover:border-orange-500/50">
-                      <img src={vol.cover} className="absolute inset-0 w-full h-full object-cover grayscale brightness-75 group-hover:grayscale-0 transition-all duration-700" alt={vol.title} />
+                      <img src={vol.coverUrl} className="absolute inset-0 w-full h-full object-cover grayscale brightness-75 group-hover:grayscale-0 transition-all duration-700" alt={vol.title} />
                       <div className="absolute inset-0 p-8 flex flex-col justify-between bg-gradient-to-t from-black/90 to-transparent">
                         <h2 className="text-white font-black italic text-4xl uppercase leading-none">
                           {vol.title.split(' ')[0]} <br/> {vol.title.split(' ')[1]}: <span className="text-orange-500 text-5xl">{vol.vol}</span>
@@ -139,23 +161,23 @@ const Lookbook = () => {
   */
   className="columns-3 md:columns-2 lg:columns-4 gap-4 md:gap-10 space-y-4 md:space-y-10 pb-32"
 >
-  {displayedImages.map((num) => (
-    <div key={num} className="group relative overflow-hidden rounded-2xl md:rounded-[2.5rem] bg-zinc-900 border border-white/5 break-inside-avoid shadow-xl">
+  {displayedImages.map((img) => (
+    <div key={img.id} className="group relative overflow-hidden rounded-2xl md:rounded-[2.5rem] bg-zinc-900 border border-white/5 break-inside-avoid shadow-xl">
       
       {/* Smaller Like Button for Mobile */}
       <button 
-        onClick={() => toggleLike(num)}
+        onClick={() => toggleLike(img.id)}
         className={`absolute top-3 right-3 md:top-5 md:right-5 z-30 p-2 md:p-4 rounded-full backdrop-blur-xl transition-all 
-          ${likedImages.includes(num) ? 'bg-orange-500 text-white' : 'bg-white/20 text-white/40 opacity-100 md:opacity-0 group-hover:opacity-100'}`}
+          ${likedIds.includes(img.id) ? 'bg-orange-500 text-white' : 'bg-white/20 text-white/40 opacity-100 md:opacity-0 group-hover:opacity-100'}`}
       >
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill={likedImages.includes(num) ? "currentColor" : "none"} stroke="currentColor" className="w-3 h-3 md:w-3 md:min-h-3">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill={likedIds.includes(img.id) ? "currentColor" : "none"} stroke="currentColor" className="w-3 h-3 md:w-3 md:min-h-3">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
         </svg>
       </button>
 
       <img 
-        src={`/lookbook/LB (${num}).jpg`} 
-        className={`w-full h-auto object-cover transition-all duration-1000 ${likedImages.includes(num) ? 'grayscale-0' : 'grayscale-0 md:grayscale group-hover:grayscale-0'}`} 
+        src={img.imageUrl}
+        className={`w-full h-auto object-cover transition-all duration-1000 ${likedIds.includes(img.id) ? 'grayscale-0' : 'grayscale-0 md:grayscale group-hover:grayscale-0'}`} 
         alt="Archive" 
       />
     </div>
